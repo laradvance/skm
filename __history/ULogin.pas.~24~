@@ -1,0 +1,305 @@
+unit ULogin;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, sButton, sEdit, sLabel,
+  sGroupBox, Vcl.ComCtrls, sPageControl, IniFiles, ComOBJ, Shellapi, DADump,
+  MyDump, sComboBox;
+
+type
+  TLogin = class(TForm)
+    Plogin: TsPageControl;
+    TabLogin: TsTabSheet;
+    TabSetting: TsTabSheet;
+    sGroupBox1: TsGroupBox;
+    sLabel10: TsLabel;
+    sLabel3: TsLabel;
+    sLabel6: TsLabel;
+    sLabel9: TsLabel;
+    Port: TsEdit;
+    username: TsEdit;
+    ButtonTest: TsButton;
+    password: TsEdit;
+    Server: TsEdit;
+    sButton1: TsButton;
+    sGroupBox2: TsGroupBox;
+    sLabel4: TsLabel;
+    sLabel5: TsLabel;
+    sEdit2: TsEdit;
+    sButton2: TsButton;
+    sEdit3: TsEdit;
+    sButton3: TsButton;
+    TabDbase: TsTabSheet;
+    sGroupBox3: TsGroupBox;
+    sButton4: TsButton;
+    OpenDialog1: TOpenDialog;
+    procedure sButton3Click(Sender: TObject);
+    procedure sButton2Click(Sender: TObject);
+    procedure sButton1Click(Sender: TObject);
+    procedure ButtonTestClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure sButton4Click(Sender: TObject);
+    procedure sEdit2KeyPress(Sender: TObject; var Key: Char);
+    procedure sEdit3KeyPress(Sender: TObject; var Key: Char);
+    procedure sButton2KeyPress(Sender: TObject; var Key: Char);
+    procedure ServerKeyPress(Sender: TObject; var Key: Char);
+    procedure PortKeyPress(Sender: TObject; var Key: Char);
+    procedure usernameKeyPress(Sender: TObject; var Key: Char);
+    procedure passwordKeyPress(Sender: TObject; var Key: Char);
+    procedure ButtonTestKeyPress(Sender: TObject; var Key: Char);
+    procedure ComboOPDKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+procedure QuerySettings(dinas,level:string);
+
+var
+  Login: TLogin;
+  serverS, portS, usernameS, passwordS, akses, User: string;
+
+implementation
+
+{$R *.dfm}
+
+uses UMain;
+
+procedure QuerySettings(dinas,level:string);
+begin
+  with main do
+  begin
+    QueryOPD.Connection := Koneksi;
+    if level='PUSLAH' then
+    Begin
+    Quser.SQL.Text:='SELECT nama,Phone, username,PASSWORD,LEVEL,nama_dinas,dinas FROM USER INNER JOIN dinas ON user.dinas=dinas.kode order by Nama asc';
+    QueryOPD.SQL.Text:='Select * From Dinas order by Kode Asc'
+    End
+     else
+    Begin
+    Quser.SQL.Text:='SELECT nama,Phone, username,PASSWORD,LEVEL,nama_dinas,dinas FROM USER INNER JOIN dinas ON user.dinas=dinas.kode WHERE dinas.kode='+dinas+' and level="OPD" order by Nama asc';
+    QueryOPD.SQL.Text:='Select * From Dinas WHERE kode='+dinas+' order by Kode Asc'
+    End;
+    QueryOPD.Active := True;
+    QSampel.Connection := Koneksi;
+    QUser.Connection := Koneksi;
+    QUser.Active := True;
+  end;
+end;
+
+procedure TLogin.ButtonTestClick(Sender: TObject);
+begin
+  begin
+    with main do
+    begin
+      Koneksi.Server := Server.Text;
+      Koneksi.username := username.Text;
+      Koneksi.password := password.Text;
+      Koneksi.Port := strtoint(Port.Text);
+      Koneksi.Database := 'ikm';
+      try
+        Koneksi.Connect;
+      except
+        on E: Exception do
+          if Pos('Unknown database', E.Message) <> 0 then
+          begin
+            messagedlg
+              ('Database Belum Ada. Silakan Buat Database terlebih dulu',
+              mterror, [mbok], 0);
+            TabDbase.TabVisible := True;
+            Plogin.TabIndex := 2;
+            Koneksi.Database := 'mysql';
+          end
+          else
+            messagedlg('Koneksi Error.', mterror, [mbok], 0);
+      end;
+      if Koneksi.Connected then
+      begin
+        showmessage('Koneksi Berhasil');
+        Login.sButton1.Enabled := True;
+      end;
+    end;
+  end;
+end;
+
+procedure TLogin.ButtonTestKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    ButtonTest.OnClick(Sender);
+end;
+
+procedure TLogin.ComboOPDKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+procedure TLogin.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  main.Koneksi.Disconnect;
+end;
+
+procedure TLogin.FormCreate(Sender: TObject);
+var
+  Config: TIniFile;
+begin
+  NullStrictConvert := False;
+  Config := TIniFile.Create(ExtractFilePath(Application.ExeName) +
+    'Config.ini');
+  try
+    serverS := Config.Readstring('Setting', 'Server', '');
+    portS := Config.Readstring('Setting', 'Port', '');
+    usernameS := Config.Readstring('Setting', 'Username', '');
+    passwordS := Config.Readstring('Setting', 'Password', '');
+  finally
+    Config.Free;
+  end;
+  Server.Text := serverS;
+  Port.Text := portS;
+  username.Text := usernameS;
+  password.Text := passwordS;
+end;
+
+procedure TLogin.passwordKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    SelectNext(Sender as TwinControl, True, True);
+end;
+
+procedure TLogin.PortKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+Procedure TLogin.sButton1Click(Sender: TObject);
+var
+  Config: TIniFile;
+begin
+  Config := TIniFile.Create(ExtractFilePath(Application.ExeName) +
+    'Config.ini');
+  try
+    Config.WriteString('Setting', 'Server', Server.Text);
+    Config.WriteString('Setting', 'Port', Port.Text);
+    Config.WriteString('Setting', 'Username', username.Text);
+    Config.WriteString('Setting', 'Password', password.Text);
+  finally
+    Config.Free;
+  end;
+  serverS := Server.Text;
+  passwordS := password.Text;
+  usernameS := username.Text;
+  portS := Port.Text;
+  sButton1.Enabled := False;
+end;
+
+procedure TLogin.sButton2Click(Sender: TObject);
+begin
+  main.Koneksi.Server := serverS;
+  main.Koneksi.username := usernameS;
+  main.Koneksi.password := passwordS;
+  main.Koneksi.Port := strtoint(portS);
+  main.Koneksi.Database := 'ikm';
+  try
+    main.Koneksi.Connect;
+  except
+    messagedlg('Koneksi Error. Silakan Atur Koneksi Terlebih dulu', mterror,
+      [mbok], 0);
+    Plogin.TabIndex := 1;
+  end;
+  if main.Koneksi.Connected then
+  begin
+    main.Query.SQL.Text := 'SELECT Username,LEVEL,dinas FROM USER WHERE USERNAME="' +
+      sEdit2.Text + '" AND PASSWORD="' + sEdit3.Text + '"';
+    main.Query.Open;
+    if not main.Query.IsEmpty then
+    begin
+      akses := main.Query.FieldByName('Level').AsString;
+      User := main.Query.FieldByName('Username').AsString;
+      QuerySettings(main.Query.FieldByName('dinas').AsString,main.Query.FieldByName('Level').AsString);
+      sEdit2.Text := '';
+      sEdit3.Text := '';
+      main.Page.TabIndex := 0;
+      main.show;
+    end
+    else
+      messagedlg('Username atau Password Salah', mterror, [mbok], 0);
+    main.Query.Close;
+  end;
+end;
+
+procedure TLogin.sButton2KeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+procedure TLogin.sButton3Click(Sender: TObject);
+begin
+  Login.Close;
+end;
+
+procedure TLogin.sButton4Click(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+  begin
+    main.Koneksi.Connect;
+    main.Dump.RestoreFromFile(OpenDialog1.FileName);
+    main.Koneksi.Database := 'ikm';
+    showmessage('Database Berhasil Dibuat');
+    TabDbase.TabVisible := False;
+    Plogin.TabIndex := 1;
+  end;
+end;
+
+procedure TLogin.sEdit2KeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+procedure TLogin.sEdit3KeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+procedure TLogin.ServerKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+procedure TLogin.usernameKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    SelectNext(Sender as TwinControl, True, True);
+  end;
+end;
+
+end.

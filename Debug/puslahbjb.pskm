@@ -1,0 +1,166 @@
+-- MyDAC version: 9.0.2
+-- MySQL server version: 5.7.20-log
+-- MySQL client version: 8.0.0 Direct
+-- Script date 5/13/2018 9:20:07 PM
+-- ---------------------------------------------------------------------- 
+-- Server: localhost
+-- Database: ikm
+
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+-- 
+-- Database ikm structure
+-- 
+
+USE mysql;
+DROP DATABASE IF EXISTS ikm;
+CREATE DATABASE ikm;
+USE ikm;
+
+-- 
+-- User permissions
+-- 
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT SUPER ON *.* TO 'mysql.session'@'localhost';
+GRANT USAGE ON *.* TO 'mysql.sys'@'localhost';
+GRANT USAGE ON *.* TO 'pma'@'localhost';
+
+-- 
+-- Table structure for table dinas
+-- 
+
+DROP TABLE IF EXISTS dinas;
+CREATE TABLE `dinas` (
+  `Kode` varchar(2) NOT NULL,
+  `Nama_Dinas` varchar(255) DEFAULT NULL,
+  `Kategori` enum('Kelurahan','Kecamatan','PKM','SOPD') DEFAULT NULL,
+  PRIMARY KEY (`Kode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 
+-- Dumping data for table dinas
+-- 
+
+LOCK TABLES dinas WRITE;
+INSERT INTO dinas VALUES
+ ('01','Dinas Arsip dan Perpustakaan Daerah','SOPD'),
+ ('02','Dinas Ketahanan Pangan, Pertanian dan Perikanan ','SOPD'),
+ ('03','Dinas Pendidikan','SOPD'),
+ ('04','Dinas Perumahan dan Pemukiman','SOPD'),
+ ('05','Dinas Sosial','SOPD'),
+ ('06','Dinas Pengendalian Penduduk, Keluarga Berencana, Pemberdayaan Masyarakat, Perempuan dan Pelindungan Anak','SOPD'),
+ ('07','Dinas Perhubungan','SOPD'),
+ ('08','Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu','SOPD'),
+ ('09','Dinas Kependudukan dan Pencatatan Sipil','SOPD'),
+ ('10','Dinas Perdagangan','SOPD'),
+ ('11','Dinas Lingkungan Hidup','SOPD'),
+ ('12','Dinas Pekerjaan Umum dan Penataan Ruang','SOPD'),
+ ('13','Dinas Kesehatan','SOPD'),
+ ('14','Badan Kepegawaian, Pendidikan dan Pelatihan Daerah','SOPD'),
+ ('15','Badan Pengelolaan Keuangan dan Aset Daerah','SOPD'),
+ ('16','Badan Pengelolaan Pajak dan Retribusi Daerah','SOPD'),
+ ('17','Inspektorat ','SOPD'),
+ ('18','Satuan Polisi Pamong Praja','SOPD'),
+ ('19','Badan Perencanaan Pembangunan, Penelitian dan Pengembangan Daerah','SOPD'),
+ ('20','Dinas Koperasi Usaha Kecil Menengah dan Tenaga Kerja','SOPD'),
+ ('21','Dinas Pemuda Olahraga, Kebudayaan dan Pariwisata','SOPD'),
+ ('22','Dinas Komunikasi dan Informatika','SOPD'),
+ ('23','Kecamatan Liang Anggang','Kecamatan'),
+ ('24','Kecamatan Landasan Ulin','Kecamatan'),
+ ('25','Kecamatan Cempaka','Kecamatan'),
+ ('26','Kecamatan Banjarbaru Utara','Kecamatan'),
+ ('27','Kecamatan Banjarbaru Selatan','Kecamatan'),
+ ('28','Kelurahan Landasan Ulin Barat','Kelurahan'),
+ ('29','Kelurahan Landasan Ulin Utara','Kelurahan'),
+ ('30','Kelurahan Landasan Ulin Tengah','Kelurahan'),
+ ('31','Kelurahan Landasa Ulin Selatan','Kelurahan'),
+ ('32','Kelurahan Guntung Payung','Kelurahan'),
+ ('33','Kelurahan Guntung Manggis','Kelurahan'),
+ ('34','Kelurahan Landasan Ulin Timur','Kelurahan'),
+ ('35','Kelurahan Syamsudin Noor','Kelurahan'),
+ ('36','Kelurahan Cempaka','Kelurahan'),
+ ('37','Kelurahan Bangkal','Kelurahan'),
+ ('38','Kelurahan Palam','Kelurahan'),
+ ('39','Kelurahan Sungai Tiung','Kelurahan'),
+ ('40','Kelurahan Loktabat Utara','Kelurahan'),
+ ('41','Kelurahan Mentaos','Kelurahan'),
+ ('42','Kelurahan Komet','Kelurahan'),
+ ('43','Kelurahan Sungai Ulin','Kelurahan'),
+ ('44','Kelurahan Guntung Paikat','Kelurahan'),
+ ('45','Kelurahan Kemuning','Kelurahan'),
+ ('46','Kelurahan Loktabat Selatan','Kelurahan'),
+ ('47','Kelurahan Sungai Besar','Kelurahan'),
+ ('48','Puskesmas Banjarbaru Selatan','PKM'),
+ ('49','Puskesmas Banjarbaru Utara','PKM'),
+ ('50','Puskesmas Sungai Ulin','PKM'),
+ ('51','Puskesmas Sungai Besar','PKM'),
+ ('52','Puskesmas Rawat Inap Cempaka','PKM'),
+ ('53','Puskesmas Guntung Payung','PKM'),
+ ('54','Puskesmas Landasan Ulin','PKM'),
+ ('55','Puskesmas Liang Anggang','PKM'),
+ ('56','Puskesmas Guntung Manggis','PKM');
+UNLOCK TABLES;
+
+-- 
+-- Table structure for table sampel
+-- 
+
+DROP TABLE IF EXISTS sampel;
+CREATE TABLE `sampel` (
+  `Kode` varchar(12) NOT NULL,
+  `Dinas` varchar(2) DEFAULT NULL,
+  `Tanggal` int(8) DEFAULT NULL,
+  `Jam` enum('1','2') DEFAULT NULL,
+  `JK` enum('1','2') DEFAULT NULL,
+  `Pendidikan` enum('1','2','3','4','5','6') DEFAULT NULL,
+  `Pekerjaan` enum('1','2','3','4','5','6') DEFAULT NULL,
+  `Umur` tinyint(3) DEFAULT NULL,
+  `Lainnya` varchar(255) DEFAULT NULL,
+  `Layanan` varchar(255) DEFAULT NULL,
+  `u1` tinyint(4) DEFAULT NULL,
+  `u2` tinyint(4) DEFAULT NULL,
+  `u3` tinyint(4) DEFAULT NULL,
+  `u4` tinyint(4) DEFAULT NULL,
+  `u5` tinyint(4) DEFAULT NULL,
+  `u6` tinyint(4) DEFAULT NULL,
+  `u7` tinyint(4) DEFAULT NULL,
+  `u8` tinyint(4) DEFAULT NULL,
+  `u9` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`Kode`),
+  KEY `sampel_ibfk_1` (`Dinas`),
+  CONSTRAINT `sampel_ibfk_1` FOREIGN KEY (`Dinas`) REFERENCES `dinas` (`Kode`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 
+-- Dumping data for table sampel
+-- 
+
+-- 
+-- Table structure for table user
+-- 
+
+DROP TABLE IF EXISTS user;
+CREATE TABLE `user` (
+  `Nama` varchar(128) DEFAULT NULL,
+  `Phone` varchar(16) DEFAULT NULL,
+  `Username` varchar(128) NOT NULL,
+  `Password` varchar(32) DEFAULT NULL,
+  `Level` enum('OPD','PUSLAH') DEFAULT NULL,
+  `Dinas` varchar(2) DEFAULT NULL,
+  PRIMARY KEY (`Username`),
+  KEY `Dinas` (`Dinas`),
+  CONSTRAINT `user_ibfk_1` FOREIGN KEY (`Dinas`) REFERENCES `dinas` (`Kode`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 
+-- Dumping data for table user
+-- 
+
+LOCK TABLES user WRITE;
+INSERT INTO user VALUES
+ ('ADMIN','081200000000','ADMIN','ADMIN','PUSLAH','01');
+UNLOCK TABLES;
+
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
